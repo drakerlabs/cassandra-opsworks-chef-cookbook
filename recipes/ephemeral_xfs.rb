@@ -27,23 +27,52 @@ package "xfsprogs" do
   action :install
 end
 
-target        = "/dev/xvdb"
-mountLocation = "/mnt"
+if node[:opsworks][:instance][:instance_type] == "m1.xlarge"
+  target        = "/dev/md0"
+  mountLocation = "/data"
+  # Install Mdadm
+  package "mdadm" do
+    action :install
+  end
+  ["xvdb", "xvdc", "xvdd", "xvde"].each do |device|
+    execute "umount ephemerals" do
+      command "sudo umount -d /dev/#{device}"
+    end
+  end
+  
+  # Create data directory to mount RAID to
+  directory "/data" do
+    owner node['cassandra']['user']
+    group node['cassandra']['user']
+    mode 00755
+    action :create
+  end
+  
+  execute "create raid" do
+    command "yes |sudo mdadm --create #{target} --level=0 -c256 --raid-devices=4 /dev/xvdb /dev/xvdc /dev/xvdd /dev/xvde"
+  end
 
-# Unmount the ephemeral storage provided by Amazon
-execute "umount" do
-  command "umount #{target}"
+else
+  target        = "/dev/xvdb"
+  mountLocation = "/mnt"
+
+  # Unmount the ephemeral storage provided by Amazon
+  execute "umount" do
+    command "umount #{target}"
+  end
 end
 
-# Make the new filesystem (-f option is used to overwrite the existing)
-execute "mkfs.xfs" do
-  command "mkfs.xfs -f #{target}"
-end
+  # Make the new filesystem (-f option is used to overwrite the existing)
+  execute "mkfs.xfs" do
+    command "mkfs.xfs -f #{target}"
+  end
+
 
 # Mount the new filesystem
 execute "mount" do
   command "mount #{target} #{mountLocation}"
 end
+
 
 # Make the mount accessible
 execute "chmod" do
