@@ -34,11 +34,11 @@ if node["opsworks"]["instance"]["instance_type"] == "m1.xlarge"
   package "mdadm" do
     action :install
   end
-  ["xvdb", "xvdc", "xvdd", "xvde"].each do |device|
-    execute "umount ephemerals" do
-      command "sudo umount -d /dev/#{device}"
-    end
+
+  execute "umount ephemerals" do
+    command "sudo umount -d /dev/xvdb"
   end
+
   
   # Create data directory to mount RAID to
   directory "/data" do
