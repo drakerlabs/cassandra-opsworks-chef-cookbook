@@ -27,7 +27,7 @@ package "xfsprogs" do
   action :install
 end
 
-if node[:opsworks][:instance][:instance_type] == "m1.xlarge"
+if node["opsworks"]["instance"]["instance_type"] == "m1.xlarge"
   target        = "/dev/md0"
   mountLocation = "/data"
   # Install Mdadm
