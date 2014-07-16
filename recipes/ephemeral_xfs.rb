@@ -68,8 +68,11 @@ end
 
 
 # Mount the new filesystem
-execute "mount" do
-  command "mount #{target} #{mountLocation}"
+mount mountLocation do
+  device target
+  fstype "xfs"
+  options "rw"
+  action :mount
 end
 
 
