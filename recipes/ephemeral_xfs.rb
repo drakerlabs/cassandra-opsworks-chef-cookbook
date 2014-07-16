@@ -35,12 +35,6 @@ if node["opsworks"]["instance"]["instance_type"] == "m1.xlarge"
   package "mdadm" do
     action :install
   end
-
-    mount "umount ephemerals" do
-      device "/dev/xvdb"
-      action :umount
-    end
-
   
     # Create data directory to mount RAID to
     directory "/data" do
@@ -48,12 +42,12 @@ if node["opsworks"]["instance"]["instance_type"] == "m1.xlarge"
       group node['cassandra']['user']
       mode 00755
       action :create
-      not_if { FileTest.directory?(target) }
+      not_if { FileTest.blockdev?(target) }
     end
   
     execute "create raid" do
-      command "yes |sudo mdadm --create #{target} --level=0 -c256 --raid-devices=4 /dev/xvdb /dev/xvdc /dev/xvdd /dev/xvde"
-      not_if { FileTest.directory?(target) }
+      command "sudo umount -d /dev/xvdb; yes |sudo mdadm --create #{target} --level=0 -c256 --raid-devices=4 /dev/xvdb /dev/xvdc /dev/xvdd /dev/xvde"
+      not_if { FileTest.blockdev?(target) }
     end
 
 else
@@ -62,7 +56,7 @@ else
 
   # Unmount the ephemeral storage provided by Amazon
   execute "umount" do
-    command "sudo umount -d /dev/xvdb"
+    command "sudo umount #{target}"
   end
 end
 
