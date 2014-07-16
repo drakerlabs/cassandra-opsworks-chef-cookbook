@@ -35,9 +35,10 @@ if node["opsworks"]["instance"]["instance_type"] == "m1.xlarge"
   package "mdadm" do
     action :install
   end
-  unless Dir.exists?(target)
+
     execute "umount ephemerals" do
       command "sudo umount -d /dev/xvdb"
+      not_if { ::File.directory?(target) }
     end
 
   
@@ -47,10 +48,12 @@ if node["opsworks"]["instance"]["instance_type"] == "m1.xlarge"
       group node['cassandra']['user']
       mode 00755
       action :create
+      not_if { ::File.directory?(target) }
     end
   
     execute "create raid" do
       command "yes |sudo mdadm --create #{target} --level=0 -c256 --raid-devices=4 /dev/xvdb /dev/xvdc /dev/xvdd /dev/xvde"
+      not_if { ::File.directory?(target) }
     end
   end
 
