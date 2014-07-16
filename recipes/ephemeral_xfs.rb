@@ -37,7 +37,7 @@ if node["opsworks"]["instance"]["instance_type"] == "m1.xlarge"
   end
   
     # Create data directory to mount RAID to
-    directory "/data" do
+    directory mountLocation do
       owner node['cassandra']['user']
       group node['cassandra']['user']
       mode 00755
@@ -46,7 +46,7 @@ if node["opsworks"]["instance"]["instance_type"] == "m1.xlarge"
     end
   
     execute "create raid" do
-      command "sudo umount -d /dev/xvdb; yes |sudo mdadm --create #{target} --level=0 -c256 --raid-devices=4 /dev/xvdb /dev/xvdc /dev/xvdd /dev/xvde"
+      command "sudo umount -d /dev/xvdb; yes |sudo mdadm --create #{target} --level=0 -c256 --raid-devices=4 /dev/xvdb /dev/xvdc /dev/xvdd /dev/xvde; mkfs.xfs -f #{target}"
       not_if { FileTest.blockdev?(target) }
     end
 
@@ -56,14 +56,15 @@ else
 
   # Unmount the ephemeral storage provided by Amazon
   execute "umount" do
-    command "sudo umount #{target}"
+    command "sudo umount #{target}; mkfs.xfs -f #{target}"
   end
 end
 
   # Make the new filesystem (-f option is used to overwrite the existing)
-  execute "mkfs.xfs" do
-    command "mkfs.xfs -f #{target}"
-  end
+  #execute "mkfs.xfs" do
+  #  command "mkfs.xfs -f #{target}"
+  #  not_if { FileTest.directory?(mountLocation) }
+  #end
 
 
 # Mount the new filesystem
