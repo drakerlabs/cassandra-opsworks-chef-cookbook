@@ -35,7 +35,7 @@ package "python-cql" do
   action :install
 end
 
-package "dsc20" do
+package node['cassandra']['dsc_version'] do
   action :install
 end
 

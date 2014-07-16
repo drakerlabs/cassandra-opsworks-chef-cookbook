@@ -1,6 +1,7 @@
 default[:cassandra] = {
   :cluster_name => "Test Cluster",
   :initial_token => "",
+  :dsc_version => "dsc20",
   :version => '2.0.8',
   :user => "cassandra",
   :jvm  => {
@@ -52,7 +53,7 @@ else
   seed_array << node["opsworks"]["instance"]["private_ip"]
 end
 
-
+# Assumes opsworks layer is named cassandra
 node["opsworks"]["layers"]["cassandra"]["instances"].each do |instance_name, values|
   # If using the multi-region snitch, we must use the public IP address
   if node["cassandra"]["snitch"] == "Ec2MultiRegionSnitch"
