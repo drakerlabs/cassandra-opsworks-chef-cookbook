@@ -55,7 +55,6 @@ if node["opsworks"]["instance"]["instance_type"] == "m1.xlarge"
       command "yes |sudo mdadm --create #{target} --level=0 -c256 --raid-devices=4 /dev/xvdb /dev/xvdc /dev/xvdd /dev/xvde"
       not_if { ::File.directory?(target) }
     end
-  end
 
 else
   target        = "/dev/xvdb"
