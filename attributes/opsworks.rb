@@ -32,6 +32,7 @@ default[:cassandra] = {
   :snitch           => 'Ec2Snitch',
   :authenticator    => 'org.apache.cassandra.auth.PasswordAuthenticator',
   :authorizer       => 'org.apache.cassandra.auth.CassandraAuthorizer',
+  :partitioner      => 'org.apache.cassandra.dht.Murmur3Partitioner',
   :native_transport => {
     :start       => true,
     :port        => 9042,
