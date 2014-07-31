@@ -27,8 +27,8 @@ package "xfsprogs" do
   action :install
 end
 
-# m1.xlarge RAID-0
-if node["opsworks"]["instance"]["instance_type"] == "m1.xlarge"
+# m1.xlarge and i2.2xlarge RAID-0
+if node["opsworks"]["instance"]["instance_type"] == "m1.xlarge" || node["opsworks"]["instance"]["instance_type"] == "i2.2xlarge"
   target        = "/dev/md0"
   mountLocation = "/data"
   # Install Mdadm
@@ -36,19 +36,30 @@ if node["opsworks"]["instance"]["instance_type"] == "m1.xlarge"
     action :install
   end
   
-    # Create data directory to mount RAID to
-    directory mountLocation do
-      owner node['cassandra']['user']
-      group node['cassandra']['user']
-      mode 00755
-      action :create
-      not_if { FileTest.blockdev?(target) }
-    end
+  # Create data directory to mount RAID to
+  directory mountLocation do
+    owner node['cassandra']['user']
+    group node['cassandra']['user']
+    mode 00755
+    action :create
+    not_if { FileTest.blockdev?(target) }
+  end
+
+  # m1.xlarge instances have four 420GB HDDs
+  if node["opsworks"]["instance"]["instance_type"] == "m1.xlarge"
+    raidDevNumber = 4
+    devList = [ "/dev/xvdb", "/dev/xvdc", "/dev/xvdd", "/dev/xvde" ]
+    
+  # I2.2xlarge instances have two 800GB SSDs
+  elsif node["opsworks"]["instance"]["instance_type"] == "i2.2xlarge"
+    raidDevNumber = 2
+    devList = [ "/dev/xvdb", "/dev/xvdc" ]
+  end
   
-    execute "create raid" do
-      command "sudo umount -d /dev/xvdb; yes |sudo mdadm --create #{target} --level=0 -c256 --raid-devices=4 /dev/xvdb /dev/xvdc /dev/xvdd /dev/xvde; mkfs.xfs -f #{target}"
-      not_if { FileTest.blockdev?(target) }
-    end
+  execute "create raid" do
+    command "sudo umount -d /dev/xvdb; yes |sudo mdadm --create #{target} --level=0 -c256 --raid-devices=#{raidDevNumber} #{devList.join(" ")}; mkfs.xfs -f #{target}"
+    not_if { FileTest.blockdev?(target) }
+  end
 
 else
   target        = "/dev/xvdb"
@@ -59,12 +70,6 @@ else
     command "sudo umount #{target}; mkfs.xfs -f #{target}"
   end
 end
-
-  # Make the new filesystem (-f option is used to overwrite the existing)
-  #execute "mkfs.xfs" do
-  #  command "mkfs.xfs -f #{target}"
-  #  not_if { FileTest.directory?(mountLocation) }
-  #end
 
 
 # Mount the new filesystem
