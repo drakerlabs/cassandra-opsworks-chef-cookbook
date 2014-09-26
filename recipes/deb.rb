@@ -36,6 +36,10 @@ package "jsvc" do
   action :install
 end
 
+package "python-support" do
+  action :install
+end
+
 package "openjdk-7-jre" do
   action :install
   # Don't install if Oracle Java (preferred) is already installed
@@ -47,6 +51,17 @@ execute "update-java-alternatives" do
   command "update-java-alternatives --set java-1.7.0-openjdk-amd64"
   # Don't install if Oracle Java (preferred) is already installed
   not_if "sudo update-alternatives --get-selections|grep -q '/usr/lib/jvm/java-7-oracle/jre/bin/java'"
+end
+
+# Download Python-Thrift
+remote_file "/tmp/#{node[:cassandra][:package][:python_thrift]}" do
+  source "#{node[:cassandra][:package][:base_url]}#{node[:cassandra][:package][:python_thrift]}"
+end
+
+# Install Python-Thrift
+dpkg_package "python-thrift" do
+  source "/tmp/#{node[:cassandra][:package][:python_thrift]}"
+  action :install
 end
 
 # Download Python-CQL

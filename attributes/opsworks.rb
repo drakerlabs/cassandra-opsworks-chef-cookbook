@@ -9,6 +9,7 @@ default[:cassandra] = {
     :version => 'cassandra_2.0.8_all.deb',
     :sha => 'c50eb2dd434df30b1ef906c328cccd3dd6d0ba4e',
     :python_cql => 'python-cql_1.4.0-1_all.deb',
+    :python_thrift => 'python-thrift-basic_0.8.0-1~ds+1_all.deb',
     :use_package => true
   },
   :user => "cassandra",
