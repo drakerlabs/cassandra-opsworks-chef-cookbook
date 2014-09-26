@@ -3,6 +3,13 @@ default[:cassandra] = {
   :initial_token => "",
   :dsc_version => "dsc20",
   :version => '2.0.8',
+  # package is used with deb.rb recipe
+  :package => {
+    :base_url => 'http://debian.datastax.com/community/pool/',
+    :version => 'cassandra_2.0.8_all.deb',
+    :sha => 'c50eb2dd434df30b1ef906c328cccd3dd6d0ba4e',
+    :use_package => true
+  },
   :user => "cassandra",
   :jvm  => {
     :xms => 32,
