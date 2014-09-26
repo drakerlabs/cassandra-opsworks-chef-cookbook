@@ -18,11 +18,6 @@
 #
 
 
-# DataStax Server Community Edition package will not install w/o this
-# one installed. MK.
-package "python-cql" do
-  action :install
-end
 
 # Provide some monitoring capabilities when logged in
 package "htop" do
@@ -54,7 +49,16 @@ execute "update-java-alternatives" do
   not_if "sudo update-alternatives --get-selections|grep -q '/usr/lib/jvm/java-7-oracle/jre/bin/java'"
 end
 
+# Download Python-CQL
+remote_file "/tmp/#{node[:cassandra][:package][:python_cql]}" do
+  source "#{node[:cassandra][:package][:base_url]}#{node[:cassandra][:package][:python_cql]}"
+end
 
+# Install Python-CQL
+dpkg_package "python-cql" do
+  source "/tmp/#{node[:cassandra][:package][:python_cql]}"
+  action :install
+end
 
 # Download Cassandra
 remote_file "/tmp/#{node[:cassandra][:package][:version]}" do
