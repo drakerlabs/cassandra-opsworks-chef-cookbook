@@ -39,7 +39,7 @@ hinted_handoff_throttle_delay_in_ms: 1
 authenticator: <%= node[:cassandra][:authenticator] %>
 
 # authorization backend, implementing IAuthority; used to limit access/provide permissions
-authority: <%= node[:cassandra][:authorizer] %>
+authority: <%= @authority %>
 
 # The partitioner is responsible for distributing rows (by key) across
 # nodes in the cluster.  Any IPartitioner may be used, including your
@@ -474,7 +474,7 @@ rpc_timeout_in_ms: 10000
 #
 # You can use a custom Snitch by setting this to the full class name
 # of the snitch, which will be assumed to be on your classpath.
-endpoint_snitch: <%= node[:cassandra][:snitch] %>
+endpoint_snitch: <%= @snitch %>
 
 # controls how often to perform the more expensive part of host score
 # calculation

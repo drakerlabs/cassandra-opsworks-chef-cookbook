@@ -74,7 +74,7 @@ authenticator: <%= node[:cassandra][:authenticator] %>
 # - AllowAllAuthorizer allows any action to any user - set it to disable authorization.
 # - CassandraAuthorizer stores permissions in system_auth.permissions table. Please
 #   increase system_auth keyspace replication factor if you use this authorizer.
-authorizer: <%= node[:cassandra][:authorizer] %>
+authorizer: <%= @authority %>
 
 # Validity period for permissions cache (fetching permissions can be an
 # expensive operation depending on the authorizer, CassandraAuthorizer is
@@ -547,7 +547,7 @@ cross_node_timeout: false
 #
 # You can use a custom Snitch by setting this to the full class name
 # of the snitch, which will be assumed to be on your classpath.
-endpoint_snitch: <%= node[:cassandra][:snitch] %>
+endpoint_snitch: <%= @snitch %>
 
 # controls how often to perform the more expensive part of host score
 # calculation
