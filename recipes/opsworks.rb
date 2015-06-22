@@ -63,3 +63,7 @@ bash "comment_parameters_2_1" do
    EOF
  end
 end
+
+execute "cassandra_restart" do
+   command "service cassandra restart"
+end
