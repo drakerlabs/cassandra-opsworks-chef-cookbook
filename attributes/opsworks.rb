@@ -74,3 +74,7 @@ node["opsworks"]["layers"]["cassandra"]["instances"].each do |instance_name, val
 end
   
 set[:cassandra][:seeds] = seed_array
+default[:cassandra11] = {
+       :snitch => 'org.apache.cassandra.locator.Ec2Snitch',
+       :authority => 'org.apache.cassandra.auth.AllowAllAuthority'
+}

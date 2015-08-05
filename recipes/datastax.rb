@@ -35,8 +35,8 @@ package "python-cql" do
   action :install
 end
 
-package node['cassandra']['dsc_version'] do
-  action :install
+execute "install_cassandra" do
+  command "apt-get install -y #{node[:cassandra][:dsc_version]}=#{node[:cassandra][:version]}* cassandra=#{node[:cassandra][:version]}"
 end
 
 # Provide some monitoring capabilities when logged in
